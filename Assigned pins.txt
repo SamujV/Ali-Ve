@@ -9,3 +9,7 @@ Touch:
 
 Dht
   pin 4
+
+Sound
+  RX 16
+  TX 17

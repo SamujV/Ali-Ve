@@ -53,6 +53,14 @@ const char *VARIABLE_LED = "led";
 
 const int PUBLISH_FREQUENCY = 5000; // Update rate in milliseconds
 
+
+// Set up the rgb led names
+uint8_t ledR = 2;
+uint8_t ledG = 34;
+uint8_t ledB = 35;
+
+bool ledsOn = false; // Variable para controlar el estado de los LEDs
+
 uint8_t tempPin = DHTPIN;
 unsigned long timer;
 
@@ -120,6 +128,10 @@ void setup()
 // SOUND
     sendCommand(CMD_SEL_DEV, 0, 1); // Seleccionar dispositivo (tarjeta SD)
 
+//LEDS
+  pinMode(ledR, OUTPUT);
+  pinMode(ledG, OUTPUT);
+  pinMode(ledB, OUTPUT);
 
   //Servo 
   pinMode(stepPin, OUTPUT);
@@ -140,6 +152,13 @@ void setup()
 
 void openFlower()
 {
+  // Encender los tres LEDs RGB al mismo tiempo
+  digitalWrite(ledR, HIGH);
+  digitalWrite(ledG, HIGH);
+  digitalWrite(ledB, HIGH);
+  ledsOn = true;
+
+  
   digitalWrite(dirPin, HIGH);
   for (int i = 0; i < stepsPerRevolution; i++) {
     digitalWrite(stepPin, HIGH);
@@ -154,7 +173,12 @@ void openFlower()
 
 void closeFlower()
 {
-
+  // Apagar los tres LEDs RGB
+  digitalWrite(ledR, LOW);
+  digitalWrite(ledG, LOW);
+  digitalWrite(ledB, LOW);
+  ledsOn = false;
+  
    // Move back (counterclockwise):
   digitalWrite(dirPin, LOW);
   for (int i = 0; i < stepsPerRevolution; i++) {

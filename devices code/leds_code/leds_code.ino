@@ -1,7 +1,7 @@
 // Set up the rgb led names
 uint8_t ledR = 2;
-uint8_t ledG = 4;
-uint8_t ledB = 5;
+uint8_t ledG = 34;
+uint8_t ledB = 35;
 
 bool ledsOn = false; // Variable para controlar el estado de los LEDs
 

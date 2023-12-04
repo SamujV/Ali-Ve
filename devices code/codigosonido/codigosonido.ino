@@ -34,7 +34,3 @@ void playSongOnSD(uint16_t number) {
   sendCommand(CMD_PLAY_SONG, highByte(number), lowByte(number));
   delay(1000); // Esperar un segundo para asegurarse de que se inicie la reproducción
 }
-
-void setVolume(uint8_t volume) {
-  sendCommand(CMD_SET_VOLUME, 50, volume);
-}
