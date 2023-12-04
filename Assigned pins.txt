@@ -1,0 +1,11 @@
+
+Servo:
+  Dirpin 18
+  StepPin 19
+  en 13
+
+Touch:
+  pin 14
+
+Dht
+  pin 4

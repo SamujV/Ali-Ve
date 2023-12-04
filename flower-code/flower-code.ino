@@ -1,4 +1,3 @@
-#include <ESP32Servo.h>
 /******************************************
 
   This example works for both Industrial and STEM users.
@@ -14,20 +13,30 @@
 /****************************************
   Define Constants
 ****************************************/
+// Define stepper motor connections and steps per revolution:
+#define dirPin 18   //right to left 3
+#define stepPin 19   //right to left 4
+#define stepsPerRevolution 1000
+#define en 13
+
+//**********************************************************
+// Define Dht11
 #define DHTPIN 4
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
+//***********************************************************
 
-#define SERVOPIN 5
-#define LEDPIN 33
-Servo myServo;
 
+
+// connection settings
 const char *UBIDOTS_TOKEN = "BBFF-5ZbbA3wyWGJmJ3uoek9FCQLFKg5Srf"; // Put here your Ubidots TOKEN
 const char *WIFI_SSID = "VIVIESCAS"; // Put here your Wi-Fi SSID
 const char *WIFI_PASS = "14442547"; // Put here your Wi-Fi password
 
+//label device
 const char *DEVICE_LABEL = "iot_device_No14"; // Put here your Device labelto which data will be published, replace No with your Kit-IoT box number
 
+//Variables
 const char *VARIABLE_TEMP = "temperature";
 const char *VARIABLE_HUM = "humidity";
 const char *VARIABLE_SERVO = "servo";
@@ -98,13 +107,14 @@ void setup()
   Serial.println(F("DHTxx test!"));
   dht.begin();
 
-  ESP32PWM::allocateTimer(0);
-  ESP32PWM::allocateTimer(1);
-  ESP32PWM::allocateTimer(2);
-  ESP32PWM::allocateTimer(3);
-  myServo.setPeriodHertz(50);    // standard 50 hz servo
-  myServo.attach(SERVOPIN);     // attaches the servo on pin 18 to the servo object
-  pinMode(LEDPIN, OUTPUT);
+  
+
+  //Servo 
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+  pinMode(en, OUTPUT);
+  digitalWrite(en, LOW); // Activate with LOW
+  
 
   value = 0;
   pos = 0;
@@ -115,6 +125,36 @@ void setup()
 
 
 }
+
+void openFlower()
+{
+  digitalWrite(dirPin, HIGH);
+  for (int i = 0; i < stepsPerRevolution; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(1000);
+  }
+
+  delay(1000);
+  
+  }
+
+void closeFlower()
+{
+
+   // Move back (counterclockwise):
+  digitalWrite(dirPin, LOW);
+  for (int i = 0; i < stepsPerRevolution; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(1000);
+  }
+
+  delay(1000);
+  }
+
 void loop()
 {
   // put your main code here, to run repeatedly:
@@ -128,23 +168,16 @@ void loop()
   /****************************************
     TOUCH INTERACTION
   ****************************************/
-  value = touchRead(13);
+  value = touchRead(14);
+  Serial.print("Touch value: ");
+  Serial.println(value);
   if (value <= 40) {
-    digitalWrite(LEDPIN, HIGH);
-
-    for (pos = 0; pos <= 180; pos += 1) { // OPEN  FLOWER
-      myServo.write(pos);
-      delay(45);
-    }
+    
+   openFlower();
 
     delay(3000); // time to wait to listen to the music
 
-    for (pos = 180; pos >= 0; pos -= 1) { // CLOSE FLOWER
-      myServo.write(pos);              // tell servo to go to position in variable 'pos'
-      delay(45);                       // waits 15ms for the servo to reach the position
-    }
-    pos = 0;
-    digitalWrite(LEDPIN, LOW);
+   closeFlower();
   }
 
 
@@ -152,37 +185,23 @@ void loop()
     UBIDOTS CONTROL
   ****************************************/
 
+//LED CONTROL
   if (ledValue == 0 && servoTemp != 1) {
-    digitalWrite(LEDPIN, LOW);
   }
   else {
-    digitalWrite(LEDPIN, HIGH);
   }
 
 
+// FLOWER CONTROL
+
   if (servo == 1 && pos == 0) {   // OPEN FLOWER
-    digitalWrite(LEDPIN, HIGH);
-
-    for (pos = 0; pos <= 179; pos += 1) { // OPEN  FLOWER
-      myServo.write(pos);
-      delay(45);
-
-    }
-
+   openFlower();
     servoTemp = 1;
   }
 
   if (servo == 0 && servoTemp == 1) { // CLOSE FLOWER
-
-    for (pos = 179; pos > 0; pos -= 1) {
-      myServo.write(pos);              // tell servo to go to position in variable 'pos'
-      delay(45);                       // waits 15ms for the servo to reach the position
-
-    }
-
-    digitalWrite(LEDPIN, LOW);
+    closeFlower();
     servoTemp = 0;
-   
   }
 
 
