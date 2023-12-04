@@ -16,6 +16,8 @@ void setup() {
 
 void loop() {
   // Move to one side (clockwise):
+
+  
   digitalWrite(dirPin, HIGH);
   for (int i = 0; i < stepsPerRevolution; i++) {
     digitalWrite(stepPin, HIGH);
